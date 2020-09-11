@@ -1170,7 +1170,7 @@ contract PositiveToken is ERC20,Ownable  {
         } 
 
         _part_for_div = 100;
-        _part_for_div = _part_for_div.sub((_refererCommissionPercentage.add(_adminCommissionPercentage.add(_toCostCommissionPercentage)))); // %80
+        _part_for_div = _part_for_div.sub((_refererCommissionPercentage.add(_adminCommissionPercentage.add(_toCostCommissionPercentage)))); 
         require(_part_for_div < 100);
 
         _part_for_div_wei = ABDKMathQuad.mul (

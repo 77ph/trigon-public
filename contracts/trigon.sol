@@ -1104,7 +1104,7 @@ contract PositiveToken is ERC20,Ownable  {
   function setCommission(uint256 _newCommissionPercentage, uint256 _newRefCommissionPercentage, uint256 _newAdminCommissionPercentage) public onlyOwner {
         require(_newCommissionPercentage > 0);
         require(_newCommissionPercentage < 100);
-        require(_newCommissionPercentage.sub(_newRefCommissionPercentage.add(_newAdminCommissionPercentage)) >= 2); // x/2 > 0 
+        require(_newCommissionPercentage.sub(_newRefCommissionPercentage.add(_newAdminCommissionPercentage)) >= 2); 
         _totalCommissionPercentage = _newCommissionPercentage;
         _refererCommissionPercentage = _newRefCommissionPercentage;
         _adminCommissionPercentage = _newAdminCommissionPercentage;
@@ -1238,7 +1238,6 @@ contract PositiveToken is ERC20,Ownable  {
         require(Initialize == true);
         require(selltokens > 0);
         _burn(msg.sender, selltokens);
-        //eth y=(1-Сv)*t*Pr
         _part_for_div = 100;
         _part_for_div = _part_for_div.sub(_toCostCommissionPercentage);
         require(_part_for_div < 100);
@@ -1254,7 +1253,7 @@ contract PositiveToken is ERC20,Ownable  {
                 ABDKMathQuad.mul(
                     _part_for_div_change,ABDKMathQuad.fromUInt(_price)
                 ), ETH_DECIMALS)
-        ); // wei
+        ); 
 
         _bank = _bank.sub(_change);
         _tokens = _tokens.sub(selltokens);

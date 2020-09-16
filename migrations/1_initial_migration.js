@@ -24,7 +24,7 @@ module.exports = async function(deployer, network, accounts) {
 
   console.log("----------------------------------");
 
-  init = await coin.init({from: accounts[0],value: 10000000000000000});
+//  init = await coin.init({from: accounts[0],value: 10000000000000000});
   
 
   bank = parseInt(await coin.bank());

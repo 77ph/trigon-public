@@ -2,9 +2,11 @@ pragma solidity 0.5.13;
 
 contract Context {
     constructor () internal { }
+
     function _msgSender() internal view returns (address payable) {
         return msg.sender;
     }
+
     function _msgData() internal view returns (bytes memory) {
         this; 
         return msg.data;
@@ -30,21 +32,25 @@ interface IERC20 {
 }
 
 library SafeMath {
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         require(c >= a, "SafeMath: addition overflow");
 
         return c;
     }
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         return sub(a, b, "SafeMath: subtraction overflow");
     }
+
     function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
         require(b <= a, errorMessage);
         uint256 c = a - b;
 
         return c;
     }
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
             return 0;
@@ -55,21 +61,29 @@ library SafeMath {
 
         return c;
     }
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         return div(a, b, "SafeMath: division by zero");
     }
+
     function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
         require(b > 0, errorMessage);
         uint256 c = a / b;
         return c;
     }
 }
+
 library ABDKMathQuad {
   bytes16 private constant POSITIVE_ZERO = 0x00000000000000000000000000000000;
+
   bytes16 private constant NEGATIVE_ZERO = 0x80000000000000000000000000000000;
+
   bytes16 private constant POSITIVE_INFINITY = 0x7FFF0000000000000000000000000000;
+
   bytes16 private constant NEGATIVE_INFINITY = 0xFFFF0000000000000000000000000000;
+
   bytes16 private constant NaN = 0x7FFF8000000000000000000000000000;
+
   function fromInt (int256 x) internal pure returns (bytes16) {
     if (x == 0) return bytes16 (0);
     else {
@@ -86,6 +100,7 @@ library ABDKMathQuad {
       return bytes16 (uint128 (result));
     }
   }
+
   function toInt (bytes16 x) internal pure returns (int256) {
     uint256 exponent = uint128 (x) >> 112 & 0x7FFF;
 
@@ -106,6 +121,7 @@ library ABDKMathQuad {
       return int256 (result);
     }
   }
+
   function fromUInt (uint256 x) internal pure returns (bytes16) {
     if (x == 0) return bytes16 (0);
     else {
@@ -120,6 +136,7 @@ library ABDKMathQuad {
       return bytes16 (uint128 (result));
     }
   }
+
   function toUInt (bytes16 x) internal pure returns (uint256) {
     uint256 exponent = uint128 (x) >> 112 & 0x7FFF;
 
@@ -136,6 +153,7 @@ library ABDKMathQuad {
 
     return result;
   }
+
   function from128x128 (int256 x) internal pure returns (bytes16) {
     if (x == 0) return bytes16 (0);
     else {
@@ -152,6 +170,7 @@ library ABDKMathQuad {
       return bytes16 (uint128 (result));
     }
   }
+
   function to128x128 (bytes16 x) internal pure returns (int256) {
     uint256 exponent = uint128 (x) >> 112 & 0x7FFF;
 
@@ -172,6 +191,7 @@ library ABDKMathQuad {
       return int256 (result);
     }
   }
+
   function from64x64 (int128 x) internal pure returns (bytes16) {
     if (x == 0) return bytes16 (0);
     else {
@@ -188,6 +208,7 @@ library ABDKMathQuad {
       return bytes16 (uint128 (result));
     }
   }
+
   function to64x64 (bytes16 x) internal pure returns (int128) {
     uint256 exponent = uint128 (x) >> 112 & 0x7FFF;
 
@@ -208,6 +229,7 @@ library ABDKMathQuad {
       return int128 (result);
     }
   }
+
   function fromOctuple (bytes32 x) internal pure returns (bytes16) {
     bool negative = x & 0x8000000000000000000000000000000000000000000000000000000000000000 > 0;
 
@@ -236,6 +258,7 @@ library ABDKMathQuad {
 
     return bytes16 (result);
   }
+
   function toOctuple (bytes16 x) internal pure returns (bytes32) {
     uint256 exponent = uint128 (x) >> 112 & 0x7FFF;
 
@@ -259,6 +282,7 @@ library ABDKMathQuad {
 
     return bytes32 (result);
   }
+
   function fromDouble (bytes8 x) internal pure returns (bytes16) {
     uint256 exponent = uint64 (x) >> 52 & 0x7FF;
 
@@ -282,6 +306,7 @@ library ABDKMathQuad {
 
     return bytes16 (uint128 (result));
   }
+
   function toDouble (bytes16 x) internal pure returns (bytes8) {
     bool negative = uint128 (x) >= 0x80000000000000000000000000000000;
 
@@ -316,14 +341,17 @@ library ABDKMathQuad {
 
     return bytes8 (result);
   }
+
   function isNaN (bytes16 x) internal pure returns (bool) {
     return uint128 (x) & 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF >
       0x7FFF0000000000000000000000000000;
   }
+
   function isInfinity (bytes16 x) internal pure returns (bool) {
     return uint128 (x) & 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF ==
       0x7FFF0000000000000000000000000000;
   }
+
   function sign (bytes16 x) internal pure returns (int8) {
     uint128 absoluteX = uint128 (x) & 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
@@ -333,16 +361,16 @@ library ABDKMathQuad {
     else if (uint128 (x) >= 0x80000000000000000000000000000000) return -1;
     else return 1;
   }
+
   function cmp (bytes16 x, bytes16 y) internal pure returns (int8) {
     uint128 absoluteX = uint128 (x) & 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
-    require (absoluteX <= 0x7FFF0000000000000000000000000000); // Not NaN
+    require (absoluteX <= 0x7FFF0000000000000000000000000000); 
 
     uint128 absoluteY = uint128 (y) & 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
-    require (absoluteY <= 0x7FFF0000000000000000000000000000); // Not NaN
+    require (absoluteY <= 0x7FFF0000000000000000000000000000); 
 
-    // Not infinities of the same sign
     require (x != y || absoluteX < 0x7FFF0000000000000000000000000000);
 
     if (x == y) return 0;
@@ -359,12 +387,14 @@ library ABDKMathQuad {
       }
     }
   }
+
   function eq (bytes16 x, bytes16 y) internal pure returns (bool) {
     if (x == y) {
       return uint128 (x) & 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF <
         0x7FFF0000000000000000000000000000;
     } else return false;
   }
+
   function add (bytes16 x, bytes16 y) internal pure returns (bytes16) {
     uint256 xExponent = uint128 (x) >> 112 & 0x7FFF;
     uint256 yExponent = uint128 (y) >> 112 & 0x7FFF;
@@ -467,9 +497,11 @@ library ABDKMathQuad {
       }
     }
   }
+
   function sub (bytes16 x, bytes16 y) internal pure returns (bytes16) {
     return add (x, y ^ 0x80000000000000000000000000000000);
   }
+
   function mul (bytes16 x, bytes16 y) internal pure returns (bytes16) {
     uint256 xExponent = uint128 (x) >> 112 & 0x7FFF;
     uint256 yExponent = uint128 (y) >> 112 & 0x7FFF;
@@ -936,41 +968,41 @@ contract ERC20 is Context, IERC20 {
     constructor() public {
         _balances[msg.sender] = _totalSupply;
     }
-
-    function totalSupply() public view returns (uint256) {
+ 
+    function totalSupply() external view returns (uint256) {
         return _totalSupply;
     }
 
-    function balanceOf(address account) public view returns (uint256) {
+    function balanceOf(address account) external view returns (uint256) {
         return _balances[account];
     }
 
-    function transfer(address recipient, uint256 amount) public returns (bool) {
+    function transfer(address recipient, uint256 amount) external returns (bool) {
         _transfer(_msgSender(), recipient, amount);
         return true;
     }
 
-    function allowance(address owner, address spender) public view returns (uint256) {
+    function allowance(address owner, address spender) external view returns (uint256) {
         return _allowances[owner][spender];
     }
 
-    function approve(address spender, uint256 amount) public returns (bool) {
+    function approve(address spender, uint256 amount) external returns (bool) {
         _approve(_msgSender(), spender, amount);
         return true;
     }
 
-    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
         _transfer(sender, recipient, amount);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
         return true;
     }
 
-    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+    function increaseAllowance(address spender, uint256 addedValue) external returns (bool) {
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
         return true;
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+    function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool) {
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
         return true;
     }
@@ -1022,274 +1054,232 @@ contract Ownable {
     owner = msg.sender;
     admin = msg.sender;
   }
- 
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
- 
-  function transferOwnership(address newOwner) public onlyOwner {
+
+  function transferOwnership(address newOwner) external onlyOwner {
     require(newOwner != address(0));      
     owner = newOwner;
   }
 
-  function transferAdmin(address newAdmin) public onlyOwner {
+  function transferAdmin(address newAdmin) external onlyOwner {
     require(newAdmin != address(0));      
     admin = newAdmin;
   }
  
 }
 
+
 contract PositiveToken is ERC20,Ownable  {
-    /* ERC20 constants */
+  /* ERC20 constants */
   string internal _name; 
   string internal _symbol;
   uint8 internal _decimals;
 
-  uint256 internal _price;
+  bytes16 internal _price;
   uint256 private _bank = 0; 
-  uint256 private _token_add; 
-  uint256 private _part_for_div; 
-  bytes16 private _part_for_div_wei; 
-  bytes16 private _part_for_div_change;
-  uint256 private _change; 
   uint256 private _tokens;
 
-  bytes16 internal TOKEN_DECIMALS;
-  bytes16 internal ETH_DECIMALS; 
-  uint256 internal _totalCommissionPercentage; 
-  uint256 internal _refererCommissionPercentage; 
-  uint256 internal _adminCommissionPercentage; 
-  uint256 internal _toCostCommissionPercentage; 
+  bytes16 internal PRICE_DECIMALS; 
 
+  uint256 internal _C; 
+  uint256 internal _Cr; 
+  uint256 internal _Ca; 
+  uint256 internal _Cg;
   bool private Initialize = false; 
-    
+
   mapping (address=>address) private registred;
   mapping (address=>address) private reff;
   uint256 private _userInContract;
 
   event Price(uint256 totalSupply,uint256 value);
 
-  function name() public view returns(string memory){
+  function name() external view returns(string memory){
 		return _name;
 	}
-	function symbol() public view returns(string memory){
+	function symbol() external view returns(string memory){
 		return _symbol;
 	}
-	function decimals() public view returns(uint8){
+	function decimals() external view returns(uint8){
 		return _decimals;
 	}
-	function price() public view returns(uint256){
-		return _price;
-	}
 
-  function bank() public view returns(uint256){
+  function bank() external view returns(uint256){
 		return _bank;
 	}
-    function getCommission() public view returns (uint256, uint256, uint256, uint256){
-		return(_totalCommissionPercentage,_refererCommissionPercentage,_adminCommissionPercentage,_toCostCommissionPercentage);
-	}
-  function getCommissionTotal() public view returns(uint256){
-        return _totalCommissionPercentage;
-  }
-  function getCommissionRef() public view returns(uint256){
-        return _refererCommissionPercentage;
-  }
-  function getCommissionAdmin() public view returns(uint256){
-        return _adminCommissionPercentage;
-  }
-  function getCommissionCost() public view returns(uint256){
-        return _toCostCommissionPercentage;
-  }
-  function setCommission(uint256 _newCommissionPercentage, uint256 _newRefCommissionPercentage, uint256 _newAdminCommissionPercentage) public onlyOwner {
-        require(_newCommissionPercentage > 0);
-        require(_newCommissionPercentage < 100);
-        require(_newCommissionPercentage.sub(_newRefCommissionPercentage.add(_newAdminCommissionPercentage)) >= 2); 
-        _totalCommissionPercentage = _newCommissionPercentage;
-        _refererCommissionPercentage = _newRefCommissionPercentage;
-        _adminCommissionPercentage = _newAdminCommissionPercentage;
-        _toCostCommissionPercentage = _newCommissionPercentage.sub(_newRefCommissionPercentage.add(_newAdminCommissionPercentage));
-        _toCostCommissionPercentage = _toCostCommissionPercentage.div(2);
+
+  function price() external view returns(uint256) {
+    bytes16 uint_price = ABDKMathQuad.mul(_price,PRICE_DECIMALS); // float price * 10**18
+    return(ABDKMathQuad.toUInt(uint_price)); // return uint price 
   }
 
-  function isRegisterd(address addr) public view returns(bool) {
-        if(registred[addr] == address(0)) {
-          return false;
-        }
-        return true;
+  function getCommission() external view returns (uint256, uint256, uint256, uint256){
+		return(_C,_Cr,_Ca,_Cg);
+	}
+
+  function getCommissionTotal() external view returns(uint256){
+    return _C;
+  }
+
+  function getCommissionRef() external view returns(uint256){
+    return _Cr;
+  }
+
+  function getCommissionAdmin() external view returns(uint256){
+    return _Ca;
+  }
+
+  function getCommissionCost() external view returns(uint256){
+    return _Cg;
+  }
+
+  function setCommission(uint256 _newC, uint256 _newCr, uint256 _newCa) external onlyOwner {
+    require(_newC > 0);
+    require(_newC < 100);
+    require(_newC.sub(_newCr.add(_newCa)) >= 2); // x/2 > 0
+    require(_newC.sub(_newCr.add(_newCa)) % 2 == 0); // x/2 = 0 
+    _C = _newC;
+    _Cr = _newCr;
+    _Ca = _newCa;
+    _Cg = _newC.sub(_newCr.add(_newCa));
+    _Cg = _Cg.div(2);
+  }
+
+  function isRegisterd(address addr) external view returns(bool) {
+    if(registred[addr] == address(0)) {
+      return false;
+    }
+    return true;
   }    
 
-  function getRef(address addr) public view returns(address) {
-        return reff[addr];
+  function isInitialize() external view returns(bool){
+    return Initialize;
   }
 
-  function getUserInContract() public view returns(uint256) {
-        return _userInContract;
+  function getRef(address addr) external view returns(address) {
+    return reff[addr];
   }
 
-
-  function init() public payable onlyOwner returns(bool) {
-        require(Initialize == false);
-        require(msg.value > 10**15);         
-        _bank = _bank.add(msg.value);
-
-        _token_add = ABDKMathQuad.toUInt (
-            ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    ABDKMathQuad.fromUInt(msg.value),ABDKMathQuad.fromUInt(_price)
-                ),TOKEN_DECIMALS)
-        );
-
-        _mint(msg.sender,_token_add);
-        _tokens = _tokens.add(_token_add);
-
-        _price = ABDKMathQuad.toUInt (
-            ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    ABDKMathQuad.fromUInt(_bank),ABDKMathQuad.fromUInt(_tokens)
-                ), ETH_DECIMALS)    
-        );
-
-        emit Price(_tokens,_price);
-        Initialize = true;
-        registred[address(0)] = admin;
-        registred[msg.sender] = admin;
-        reff[msg.sender] = admin;
-        return Initialize;
+  function getUserInContract() external view returns(uint256) {
+    return _userInContract;
   }
 
-  function buytoken(address _refferer) public payable {
-        require(Initialize == true);
-        require(_refferer != msg.sender);
-        require(msg.value > 10**15); 
+  function init() external payable onlyOwner returns(bool) {
+    require(Initialize == false);
+    require(msg.value > 10**15); // init price 0.001 Eth = 10**15 Wei
+    bytes16 _adm_add_tmp = ABDKMathQuad.div( ABDKMathQuad.fromUInt(msg.value), _price);
+    uint256 _adm_add = ABDKMathQuad.toUInt(_adm_add_tmp);
+    _mint(msg.sender, _adm_add);
+    _tokens = _tokens.add(_adm_add);
 
-        _refferer = registred[_refferer];
+    _bank = _bank.add(msg.value);
 
-        if(_refferer == address(0)) {
-           _refferer = admin;
-        } 
+    _price = ABDKMathQuad.div( ABDKMathQuad.fromUInt(_bank),ABDKMathQuad.fromUInt(_tokens));
+    bytes16 uint_price = ABDKMathQuad.mul(_price,PRICE_DECIMALS); // float price * 10**18
 
-        _part_for_div = 100;
-        _part_for_div = _part_for_div.sub((_refererCommissionPercentage.add(_adminCommissionPercentage.add(_toCostCommissionPercentage)))); 
-        require(_part_for_div < 100);
+    emit Price(_tokens,ABDKMathQuad.toUInt(uint_price));
 
-        _part_for_div_wei = ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    ABDKMathQuad.fromUInt(msg.value),ABDKMathQuad.fromUInt(_part_for_div)
-                ), ABDKMathQuad.fromUInt(100)
-        );
+    Initialize = true;
+    registred[address(0)] = admin;
+    registred[msg.sender] = admin;
+    reff[msg.sender] = admin;
+    return Initialize;
+  }
+
+  function buytoken(address _refferer) external payable {
+    require(Initialize == true);
+    require(_refferer != msg.sender);
+    require(msg.value > 10**15); // init price 0.001
         
-        _token_add = ABDKMathQuad.toUInt (
-            ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    _part_for_div_wei,ABDKMathQuad.fromUInt(_price)
-                ),TOKEN_DECIMALS)
-        );
-        _mint(msg.sender,_token_add);
-        _tokens = _tokens.add(_token_add);
-       
-        _part_for_div = _adminCommissionPercentage; //5%
-        _part_for_div_wei = ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    ABDKMathQuad.fromUInt(msg.value),ABDKMathQuad.fromUInt(_part_for_div)
-                ), ABDKMathQuad.fromUInt(100));
-        
-        _token_add = ABDKMathQuad.toUInt (
-            ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    _part_for_div_wei,ABDKMathQuad.fromUInt(_price)
-                ),TOKEN_DECIMALS)
-        );
-        _mint(admin,_token_add);
-        _tokens = _tokens.add(_token_add);
+    _refferer = registred[_refferer];
+      // by default 0
+    if(_refferer == address(0)) {
+      _refferer = admin;
+    }
 
-        _part_for_div = _refererCommissionPercentage; //5%
-        _part_for_div_wei = ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    ABDKMathQuad.fromUInt(msg.value),ABDKMathQuad.fromUInt(_part_for_div)
-                ), ABDKMathQuad.fromUInt(100));
-        
-        _token_add = ABDKMathQuad.toUInt (
-            ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    _part_for_div_wei,ABDKMathQuad.fromUInt(_price)
-                ),TOKEN_DECIMALS)
-        );
-        _mint(_refferer,_token_add);
-        _tokens = _tokens.add(_token_add);
+    uint256 _100_precent = 100;
+    uint256 _sub_part = _Cr + _Ca + _Cg;
+    uint256 _part_us = _100_precent.sub(_sub_part);
 
-        _bank = _bank.add(msg.value);
-        _price = ABDKMathQuad.toUInt (
-            ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    ABDKMathQuad.fromUInt(_bank),ABDKMathQuad.fromUInt(_tokens)
-                ), ETH_DECIMALS)    
-        );
-        emit Price(_tokens,_price);
+    bytes16 _part_numerator_us = ABDKMathQuad.div( ABDKMathQuad.fromUInt(_part_us), ABDKMathQuad.fromUInt(100) ); 
+    bytes16 _us_add_tmp = ABDKMathQuad.mul(_part_numerator_us,ABDKMathQuad.fromUInt(msg.value));
+    _us_add_tmp = ABDKMathQuad.div(_us_add_tmp,_price);
+    uint256 _us_add = ABDKMathQuad.toUInt(_us_add_tmp);
+    _mint(msg.sender,_us_add);
+    _tokens = _tokens.add(_us_add);
 
-        if(registred[msg.sender] == address(0)) {
-            registred[msg.sender] = msg.sender;
-            _userInContract = _userInContract.add(1);
-        }
-        reff[msg.sender] = _refferer;
+    bytes16 _part_numerator_ref = ABDKMathQuad.div(ABDKMathQuad.fromUInt(_Cr),ABDKMathQuad.fromUInt(100)); 
+    bytes16 _ref_add_tmp = ABDKMathQuad.mul(_part_numerator_ref,ABDKMathQuad.fromUInt(msg.value));
+    _ref_add_tmp = ABDKMathQuad.div(_ref_add_tmp,_price);
+    uint256 _ref_add = ABDKMathQuad.toUInt(_ref_add_tmp);
+
+    _mint(_refferer,_ref_add);
+    _tokens = _tokens.add(_ref_add);
+
+    bytes16 _part_numerator_adm = ABDKMathQuad.div(ABDKMathQuad.fromUInt(_Ca),ABDKMathQuad.fromUInt(100)); 
+    bytes16 _adm_add_tmp = ABDKMathQuad.mul(_part_numerator_adm,ABDKMathQuad.fromUInt(msg.value));
+    _adm_add_tmp = ABDKMathQuad.div(_adm_add_tmp,_price);
+    uint256 _adm_add = ABDKMathQuad.toUInt(_adm_add_tmp);
+
+    _mint(admin,_adm_add);
+    _tokens = _tokens.add(_adm_add);
+
+    _bank = _bank.add(msg.value);
+
+    _price = ABDKMathQuad.div( ABDKMathQuad.fromUInt(_bank),ABDKMathQuad.fromUInt(_tokens));
+    bytes16 uint_price = ABDKMathQuad.mul(_price,PRICE_DECIMALS); 
+
+    emit Price(_tokens,ABDKMathQuad.toUInt(uint_price));
+
+    if(registred[msg.sender] == address(0)) {
+      registred[msg.sender] = msg.sender;
+      _userInContract = _userInContract.add(1);
+    }
+    reff[msg.sender] = _refferer;
   }
 
-  function sell(uint256 selltokens) public payable {
-        require(Initialize == true);
-        require(selltokens > 0);
-        _burn(msg.sender, selltokens);
-        _part_for_div = 100;
-        _part_for_div = _part_for_div.sub(_toCostCommissionPercentage);
-        require(_part_for_div < 100);
+  function sell(uint256 selltokens) external payable {
+    require(Initialize == true);
+    require(selltokens > 0);
+    _burn(msg.sender, selltokens);
+    uint256 _100_precent = 100;
+    uint256 _part_us = _100_precent.sub(_Cg);
+    bytes16 _part_mul_us = ABDKMathQuad.div( ABDKMathQuad.fromUInt(_part_us),ABDKMathQuad.fromUInt(100) ); 
+    bytes16 _us_sub_tmp = ABDKMathQuad.mul(_part_mul_us,ABDKMathQuad.fromUInt(selltokens));
+    bytes16 _us_sub = ABDKMathQuad.mul(_us_sub_tmp,_price);
+    uint256 _withdraw =  ABDKMathQuad.toUInt(_us_sub);
+    
+    _bank = _bank.sub(_withdraw);
+    _tokens = _tokens.sub(selltokens);
 
-        _part_for_div_change = ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    ABDKMathQuad.fromUInt(selltokens),ABDKMathQuad.fromUInt(_part_for_div)
-                ), ABDKMathQuad.fromUInt(100)
-        );
+    _price = ABDKMathQuad.div( ABDKMathQuad.fromUInt(_bank),ABDKMathQuad.fromUInt(_tokens));
+    bytes16 uint_price = ABDKMathQuad.mul(_price,PRICE_DECIMALS); // float price * 10**18  
 
-        _change = ABDKMathQuad.toUInt (
-            ABDKMathQuad.div (
-                ABDKMathQuad.mul(
-                    _part_for_div_change,ABDKMathQuad.fromUInt(_price)
-                ), ETH_DECIMALS)
-        ); 
+    emit Price(_tokens,ABDKMathQuad.toUInt(uint_price));
 
-        _bank = _bank.sub(_change);
-        _tokens = _tokens.sub(selltokens);
-
-        _price = ABDKMathQuad.toUInt (
-            ABDKMathQuad.mul (
-                ABDKMathQuad.div (
-                    ABDKMathQuad.fromUInt(_bank),ABDKMathQuad.fromUInt(_tokens)
-                ), ETH_DECIMALS)    
-        );
-        emit Price(_tokens,_price);
-        msg.sender.transfer(_change);
+    msg.sender.transfer(_withdraw);
   }
 
 }
 
 contract Trigon is PositiveToken {
-    constructor()
-        public
-    {
+  constructor()
+    public {
+      _name = "Trigon Token";
+		  _symbol = "TRG";
+		  _decimals = 18;
+		  _price = ABDKMathQuad.div ( ABDKMathQuad.fromUInt(1), ABDKMathQuad.fromUInt(1000) ); // 0.001
+      _C  = 20; 
+      _Cr = 5; 
+      _Ca = 5; 
+      _Cg = _C.sub(_Cr.add(_Ca));
+      _Cg = _Cg.div(2);
+      uint256 t = 10**18;
+      PRICE_DECIMALS = ABDKMathQuad.fromUInt(t);
+  }
 
-        _name = "Trigon Token";
-		    _symbol = "TRG";
-		    _decimals = 18;
-		    _price = 1*(10**15);
-        _totalCommissionPercentage = 20; 
-        _refererCommissionPercentage = 5;
-        _adminCommissionPercentage = 5; 
-        _toCostCommissionPercentage = _totalCommissionPercentage.sub(_refererCommissionPercentage.add(_adminCommissionPercentage));
-        _toCostCommissionPercentage = _toCostCommissionPercentage.div(2);
-        uint256 t = _decimals;
-        t = 10**t;
-        TOKEN_DECIMALS =  ABDKMathQuad.fromUInt(t);
-        t = 10**18;
-        ETH_DECIMALS = ABDKMathQuad.fromUInt(t);
-    }
-
-    function() external payable {}
+  function() external payable {}
 }

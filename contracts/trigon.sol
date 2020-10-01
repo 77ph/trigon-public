@@ -1056,17 +1056,17 @@ contract Ownable {
   }
 
   modifier onlyOwner() {
-    require(msg.sender == owner);
+    require(msg.sender == owner, "Ownable: msg.sender not owner");
     _;
   }
 
   function transferOwnership(address newOwner) external onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0), "Ownable: owner is zero address");      
     owner = newOwner;
   }
 
   function transferAdmin(address newAdmin) external onlyOwner {
-    require(newAdmin != address(0));      
+    require(newAdmin != address(0), "Ownable: admin is zero address");      
     admin = newAdmin;
   }
  
@@ -1096,20 +1096,21 @@ contract PositiveToken is ERC20,Ownable  {
   uint256 private _userInContract;
 
   event Price(uint256 totalSupply,uint256 value);
+  event Diff(uint256 diff);
 
   function name() external view returns(string memory){
-		return _name;
-	}
-	function symbol() external view returns(string memory){
-		return _symbol;
-	}
-	function decimals() external view returns(uint8){
-		return _decimals;
-	}
+    return _name;
+  }
+  function symbol() external view returns(string memory){
+    return _symbol;
+  }
+  function decimals() external view returns(uint8){
+    return _decimals;
+  }
 
   function bank() external view returns(uint256){
-		return _bank;
-	}
+    return _bank;
+  }
 
   function price() external view returns(uint256) {
     bytes16 uint_price = ABDKMathQuad.mul(_price,PRICE_DECIMALS); // float price * 10**18
@@ -1117,8 +1118,8 @@ contract PositiveToken is ERC20,Ownable  {
   }
 
   function getCommission() external view returns (uint256, uint256, uint256, uint256){
-		return(_C,_Cr,_Ca,_Cg);
-	}
+    return(_C,_Cr,_Ca,_Cg);
+  }
 
   function getCommissionTotal() external view returns(uint256){
     return _C;
@@ -1137,10 +1138,10 @@ contract PositiveToken is ERC20,Ownable  {
   }
 
   function setCommission(uint256 _newC, uint256 _newCr, uint256 _newCa) external onlyOwner {
-    require(_newC > 0);
-    require(_newC < 100);
-    require(_newC.sub(_newCr.add(_newCa)) >= 2); // x/2 > 0
-    require(_newC.sub(_newCr.add(_newCa)) % 2 == 0); // x/2 = 0 
+    require(_newC > 0, "Trigon: newC is 0");
+    require(_newC < 100, "Trigon: newC > 100");
+    require(_newC.sub(_newCr.add(_newCa)) >= 2, "Trigon: newC - (newCr + newCa) <= 2"); // x/2 > 0
+    require(_newC.sub(_newCr.add(_newCa)) % 2 == 0, "Trigon: newC - (newCr + newCa) not shared"); // x%2 = 0 
     _C = _newC;
     _Cr = _newCr;
     _Ca = _newCa;
@@ -1168,8 +1169,8 @@ contract PositiveToken is ERC20,Ownable  {
   }
 
   function init() external payable onlyOwner returns(bool) {
-    require(Initialize == false);
-    require(msg.value > 10**15); // init price 0.001 Eth = 10**15 Wei
+    require(Initialize == false, "Trigon: Initialize is true");
+    require(msg.value > 10**15, "Trigon: eth value < 10^15 Wei"); // init price 0.001 Eth = 10**15 Wei
     bytes16 _adm_add_tmp = ABDKMathQuad.div( ABDKMathQuad.fromUInt(msg.value), _price);
     uint256 _adm_add = ABDKMathQuad.toUInt(_adm_add_tmp);
     _mint(msg.sender, _adm_add);
@@ -1190,9 +1191,9 @@ contract PositiveToken is ERC20,Ownable  {
   }
 
   function buytoken(address _refferer) external payable {
-    require(Initialize == true);
-    require(_refferer != msg.sender);
-    require(msg.value > 10**15); // init price 0.001
+    require(Initialize == true, "Trigon: Initialize is false");
+    require(_refferer != msg.sender, "Trigon: self-refferer");
+    require(msg.value > 10**15, "Trigon: eth value < 10^15 Wei"); // init price 0.001
         
     _refferer = registred[_refferer];
       // by default 0
@@ -1201,28 +1202,26 @@ contract PositiveToken is ERC20,Ownable  {
     }
 
     uint256 _100_precent = 100;
-    uint256 _sub_part = _Cr + _Ca + _Cg;
-    uint256 _part_us = _100_precent.sub(_sub_part);
+    uint256 _part_virtual = _100_precent.sub(_Cg);
+    uint256 _part_us = _100_precent.add(_Ca).add(_Cr);
 
-    bytes16 _part_numerator_us = ABDKMathQuad.div( ABDKMathQuad.fromUInt(_part_us), ABDKMathQuad.fromUInt(100) ); 
-    bytes16 _us_add_tmp = ABDKMathQuad.mul(_part_numerator_us,ABDKMathQuad.fromUInt(msg.value));
-    _us_add_tmp = ABDKMathQuad.div(_us_add_tmp,_price);
-    uint256 _us_add = ABDKMathQuad.toUInt(_us_add_tmp);
+    bytes16 _pre_virtual_tokens = ABDKMathQuad.div( ABDKMathQuad.fromUInt(msg.value), _price);
+    uint256 _pre_virtual_tokens_int = ABDKMathQuad.toUInt(_pre_virtual_tokens);
+    uint256 _virtual_tokens_int = _pre_virtual_tokens_int.mul(_part_virtual).div(100);
+    uint256 _us_add = _virtual_tokens_int.mul(100).mul(100).div(_part_us).div(100);
+
+    uint256 _ref_add = _us_add.mul(_Cr).div(100); // % us_tokens
+    uint256 _adm_add = _us_add.mul(_Ca).div(100); // % us_tokens
+
+    require(_pre_virtual_tokens_int >=  _us_add + _ref_add + _adm_add, "N < Na + Nr + Nu");
+    uint256 diff_div = _pre_virtual_tokens_int - (_us_add + _ref_add + _adm_add);
+    emit Diff(diff_div);
+
     _mint(msg.sender,_us_add);
     _tokens = _tokens.add(_us_add);
 
-    bytes16 _part_numerator_ref = ABDKMathQuad.div(ABDKMathQuad.fromUInt(_Cr),ABDKMathQuad.fromUInt(100)); 
-    bytes16 _ref_add_tmp = ABDKMathQuad.mul(_part_numerator_ref,ABDKMathQuad.fromUInt(msg.value));
-    _ref_add_tmp = ABDKMathQuad.div(_ref_add_tmp,_price);
-    uint256 _ref_add = ABDKMathQuad.toUInt(_ref_add_tmp);
-
     _mint(_refferer,_ref_add);
     _tokens = _tokens.add(_ref_add);
-
-    bytes16 _part_numerator_adm = ABDKMathQuad.div(ABDKMathQuad.fromUInt(_Ca),ABDKMathQuad.fromUInt(100)); 
-    bytes16 _adm_add_tmp = ABDKMathQuad.mul(_part_numerator_adm,ABDKMathQuad.fromUInt(msg.value));
-    _adm_add_tmp = ABDKMathQuad.div(_adm_add_tmp,_price);
-    uint256 _adm_add = ABDKMathQuad.toUInt(_adm_add_tmp);
 
     _mint(admin,_adm_add);
     _tokens = _tokens.add(_adm_add);
@@ -1242,9 +1241,10 @@ contract PositiveToken is ERC20,Ownable  {
   }
 
   function sell(uint256 selltokens) external payable {
-    require(Initialize == true);
-    require(selltokens > 0);
+    require(Initialize == true, "Trigon: Initialize is false");
+    require(selltokens > 0, "Trigon: sell tokens is zero");
     _burn(msg.sender, selltokens);
+
     uint256 _100_precent = 100;
     uint256 _part_us = _100_precent.sub(_Cg);
     bytes16 _part_mul_us = ABDKMathQuad.div( ABDKMathQuad.fromUInt(_part_us),ABDKMathQuad.fromUInt(100) ); 
@@ -1269,9 +1269,9 @@ contract Trigon is PositiveToken {
   constructor()
     public {
       _name = "Trigon Token";
-		  _symbol = "TRG";
-		  _decimals = 18;
-		  _price = ABDKMathQuad.div ( ABDKMathQuad.fromUInt(1), ABDKMathQuad.fromUInt(1000) ); // 0.001
+      _symbol = "TRGN";
+      _decimals = 18;
+      _price = ABDKMathQuad.div ( ABDKMathQuad.fromUInt(1), ABDKMathQuad.fromUInt(1000) ); // 0.001
       _C  = 20; 
       _Cr = 5; 
       _Ca = 5; 

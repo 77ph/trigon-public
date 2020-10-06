@@ -1170,7 +1170,7 @@ contract PositiveToken is ERC20,Ownable  {
 
   function init() external payable onlyOwner returns(bool) {
     require(Initialize == false, "Trigon: Initialize is true");
-    require(msg.value > 10**15, "Trigon: eth value < 10^15 Wei"); // init price 0.001 Eth = 10**15 Wei
+    require(msg.value > 10**16, "Trigon: eth value < 10^16 Wei"); // init price 0.01 Eth = 10**16 Wei
     bytes16 _adm_add_tmp = ABDKMathQuad.div( ABDKMathQuad.fromUInt(msg.value), _price);
     uint256 _adm_add = ABDKMathQuad.toUInt(_adm_add_tmp);
     _mint(msg.sender, _adm_add);
@@ -1193,7 +1193,7 @@ contract PositiveToken is ERC20,Ownable  {
   function buytoken(address _refferer) external payable {
     require(Initialize == true, "Trigon: Initialize is false");
     require(_refferer != msg.sender, "Trigon: self-refferer");
-    require(msg.value > 10**15, "Trigon: eth value < 10^15 Wei"); // init price 0.001
+    require(msg.value > 10**16, "Trigon: eth value < 10^16 Wei"); // init price 0.01
         
     _refferer = registred[_refferer];
       // by default 0
@@ -1271,7 +1271,7 @@ contract Trigon is PositiveToken {
       _name = "Trigon Token";
       _symbol = "TRGN";
       _decimals = 18;
-      _price = ABDKMathQuad.div ( ABDKMathQuad.fromUInt(1), ABDKMathQuad.fromUInt(1000) ); // 0.001
+      _price = ABDKMathQuad.div ( ABDKMathQuad.fromUInt(1), ABDKMathQuad.fromUInt(100) ); // 0.01
       _C  = 20; 
       _Cr = 5; 
       _Ca = 5; 
